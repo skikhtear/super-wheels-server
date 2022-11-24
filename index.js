@@ -42,6 +42,7 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 
 const usersCollection = client.db('superWheels').collection('users');
 const categoryCollection = client.db('superWheels').collection('category');
+const sellPostCollection = client.db('superWheels').collection('sellpost');
 
 async function  run(){
     try{
@@ -66,11 +67,18 @@ async function  run(){
             const query = { email: email };
             const user = await usersCollection.findOne(query);
             if (user) {
-                const token = jwt.sign({ email }, process.env.ACCESS_TOKEN, { expiresIn: '1h' })
+                const token = jwt.sign({ email }, process.env.ACCESS_TOKEN, { expiresIn: '24h' })
                 return res.send({ accessToken: token });
             }
             res.status(403).send({ accessToken: '' })
         });
+
+
+        app.post('/sellpost',verifyJWT, async(req, res)=>{
+            const doctor = req.body;
+            const result = await sellPostCollection.insertOne(doctor);
+            res.send(result);
+        })
     }
     finally{
 

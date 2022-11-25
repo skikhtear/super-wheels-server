@@ -53,6 +53,26 @@ async function  run(){
         })
 
 
+        app.get('/sellpost',async (req,res)=>{
+            const query = {};
+            const result = await sellPostCollection.find(query).toArray();
+            res.send(result)
+        })
+        
+        app.get('/sellpost/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const sellpost = await sellPostCollection.findOne(query);
+            res.send(sellpost);
+        })
+
+        app.get('/category/:id',async (req, res) => {
+            const id = req.params.id;
+            const query = {category_id: id};
+            const category_post =await sellPostCollection.find(query).toArray();
+            res.send(category_post)
+        
+        });
 
         app.post('/users', async (req, res) => {
             const user = req.body;

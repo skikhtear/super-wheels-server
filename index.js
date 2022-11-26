@@ -94,7 +94,7 @@ async function  run(){
         })
 
 
-        app.get('/sellposts',verifyJWT, async(req, res)=>{
+        app.get('/sellposts', async(req, res)=>{
             const email = req.query.email;
             const decodedEmail = req.decoded.email;
     
@@ -106,10 +106,16 @@ async function  run(){
             res.send(posts)  
         })
 
-        app.delete('/sellpost/:id', verifyJWT, verifySeller, async (req, res) => {
+        app.post('/sellpost', async(req, res)=>{
+            const doctor = req.body;
+            const result = await sellPostCollection.insertOne(doctor);
+            res.send(result);
+        })
+
+        app.delete('/sellpost/:id', async (req, res) => {
             const id = req.params.id;
             const filter = { _id: ObjectId(id) };
-            const result = await doctorsCollection.deleteOne(filter);
+            const result = await sellPostCollection.deleteOne(filter);
             res.send(result);
         })
 
@@ -133,19 +139,13 @@ async function  run(){
             const email = req.params.email;
             const query = { email }
             const user = await usersCollection.findOne(query);
-            res.send({ isAdmin: user?.role === 'admin' });
+            res.send({ isAdmin: user?.role==='admin' });
         });
         app.get('/users/seller/:email', async (req, res) => {
             const email = req.params.email;
             const query = { email }
             const user = await usersCollection.findOne(query);
             res.send({ isSeller: user?.role === 'seller' });
-        });
-        app.get('/users/buyer/:email', async (req, res) => {
-            const email = req.params.email;
-            const query = { email }
-            const user = await usersCollection.findOne(query);
-            res.send({ isBuyer: user?.role === 'buyer' });
         });
 
 
@@ -156,7 +156,12 @@ async function  run(){
             res.send(result);
         });
         
-    
+        app.delete('/users/:id', async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: ObjectId(id) };
+            const result = await usersCollection.deleteOne(filter);
+            res.send(result);
+        })
 
         app.get('/jwt', async (req, res) => {
             const email = req.query.email;
@@ -170,11 +175,7 @@ async function  run(){
         });
 
 
-        app.post('/sellpost',verifyJWT, async(req, res)=>{
-            const doctor = req.body;
-            const result = await sellPostCollection.insertOne(doctor);
-            res.send(result);
-        })
+        
     }
     finally{
 

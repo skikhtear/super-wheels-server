@@ -71,9 +71,6 @@ async function  run(){
             }
             next();
         }
-    
-
-
 
 
         app.get('/category', async(req, res)=>{
@@ -97,7 +94,7 @@ async function  run(){
         })
 
 
-        app.get('/sellpost',verifyJWT, async(req, res)=>{
+        app.get('/sellposts',verifyJWT, async(req, res)=>{
             const email = req.query.email;
             const decodedEmail = req.decoded.email;
     
@@ -105,8 +102,8 @@ async function  run(){
                 return res.status(403).send({ message: 'forbidden access' });
             }
             const query = {email: email};
-            const bookings = await bookingsCollection.find(query).toArray();
-            res.send(bookings)  
+            const posts = await sellPostCollection.find(query).toArray();
+            res.send(posts)  
         })
 
         app.delete('/sellpost/:id', verifyJWT, verifySeller, async (req, res) => {
@@ -143,6 +140,12 @@ async function  run(){
             const query = { email }
             const user = await usersCollection.findOne(query);
             res.send({ isSeller: user?.role === 'seller' });
+        });
+        app.get('/users/buyer/:email', async (req, res) => {
+            const email = req.params.email;
+            const query = { email }
+            const user = await usersCollection.findOne(query);
+            res.send({ isBuyer: user?.role === 'buyer' });
         });
 
 

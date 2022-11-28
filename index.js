@@ -187,7 +187,7 @@ async function  run(){
             res.send(result);
         })
 
-        app.post('/bookings',async(req, res)=>{
+        app.post('/bookings',verifyJWT,async(req, res)=>{
             const booking =req.body;
             console.log(booking);
             const query = {
@@ -211,6 +211,30 @@ async function  run(){
             res.send(result)
         })
         
+        app.get('/bookings', async (req, res) => {
+            const query = {};
+            const bookings = await bookingsCollection.find(query).toArray();
+            res.send(bookings);
+        });
+
+        app.get('/bookings', async(req, res)=>{
+            const email = req.query.email;
+            const decodedEmail = req.decoded.email;
+    
+            if (email !== decodedEmail) {
+                return res.status(403).send({ message: 'forbidden access' });
+            }
+            const query = {email: email};
+            const bookings = await bookingsCollection.find(query).toArray();
+            res.send(bookings)  
+        })
+
+        app.delete('/bookings/:id',verifyJWT, async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: ObjectId(id) };
+            const result = await bookingsCollection.deleteOne(filter);
+            res.send(result);
+        })
     }
     finally{
 
